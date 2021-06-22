@@ -1,6 +1,9 @@
 ﻿using BookProject.interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BookProject
 {
@@ -9,12 +12,13 @@ namespace BookProject
         private readonly IBookListStorage _storage;
 
         /// <summary>
-        /// Initializes a new instance of the BookListService class.
+        ///BookListService.
         /// </summary>
         /// <param name="books">Books to be stored.</param>
         public BookListService(IBookListStorage storage)
         {
             _storage = storage;
+            Books = _storage.Load();
         }
 
         /// <summary>
@@ -27,11 +31,9 @@ namespace BookProject
         /// </summary>
         /// <param name="book">Book to be added.</param>
         /// <exception cref="ArgumentException">Thrown when the book has already been stored.</exception>
-        /// <exception cref="ArgumentNullException">Thrown when the argument is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when the argument is null.</exception>
         public void Add(Book book)
         {
-            Books = _storage.Load();
-
             if (book == null)
             {
                 throw new ArgumentNullException(nameof(book));
@@ -43,7 +45,6 @@ namespace BookProject
             }
 
             Books.Add(book);
-            Save();
         }
 
         /// <summary>
@@ -54,8 +55,6 @@ namespace BookProject
         /// <exception cref="ArgumentNullException">Thrown when the argument is null.</exception>
         public void Remove(Book book)
         {
-            Books = _storage.Load();
-
             if (Books.Count == 0)
             {
                 throw new ArgumentException("The storage empty, you can not remove book", nameof(book));
@@ -72,7 +71,6 @@ namespace BookProject
             }
 
             Books.Remove(book);
-            Save();
         }
 
         /// <summary>
@@ -80,16 +78,12 @@ namespace BookProject
         /// </summary>
         public void Sort()
         {
-            Books = _storage.Load();
             Books.Sort();
-            Save();           
         }
 
         public void Sort(IComparer<Book> comparator)
         {
-            Books = _storage.Load();
             Books.Sort(comparator);
-            Save();
         }
 
         /// <summary>
@@ -100,8 +94,6 @@ namespace BookProject
         /// <returns></returns>
         public IEnumerable<Book> FindByTag(IFindByTag finder)
         {
-            Books = _storage.Load();
-
             foreach (Book book in Books)
             {
                 if (finder.Contain(book))

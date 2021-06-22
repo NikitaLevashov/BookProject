@@ -11,6 +11,16 @@ namespace BookProject.Tests
 {
     public class Tests
     {
+        private Mock<IBookListStorage> mock;
+        private Mock<IFindByTag> mockTag;
+
+        [OneTimeSetUp]
+        public void SetUp()
+        {
+            mockTag = new Mock<IFindByTag>();
+            mock = new Mock<IBookListStorage>();
+        }
+
         private readonly Book book = new Book("Nikita", "C# forever book", "Main  publisher", "978-1734314502");
         private readonly Book book1 = new Book("Misha", "F# book", "Main  publisher", "0-306-40615-2");
         private readonly Book book2 = new Book("Alex", "F# Skitt", "Main  publisher", "0-306-40615-2");
@@ -275,7 +285,7 @@ namespace BookProject.Tests
             FakeBookListStorage fake = new FakeBookListStorage(fakeList);
             fake.Save(fakeList);
 
-            var excpected = 6;
+            var excpected = 3;
 
             Assert.AreEqual(fakeList.Count, excpected);
         }
@@ -295,7 +305,7 @@ namespace BookProject.Tests
         }
 
         [Test]
-        public void Tests_ToSave_LoadBookInStorage_()
+        public void Tests_ToLoad_LoadBookInStorage_()
         {
             List<Book> fakeList = new List<Book> { book1, book2, book };
             FakeBookListStorage fake = new FakeBookListStorage(fakeList);
@@ -404,17 +414,7 @@ namespace BookProject.Tests
 
             Assert.AreEqual(excpected, resultBool);
         }
-
-
-        private Mock<IBookListStorage> mock;
-        private Mock<IFindByTag> mockTag;
-
-        [OneTimeSetUp]
-        public void SetUp()
-        {
-            mockTag = new Mock<IFindByTag>();
-            mock = new Mock<IBookListStorage>();
-        }
+       
 
         [Test]
         public void LoadListBookOnceTime()
