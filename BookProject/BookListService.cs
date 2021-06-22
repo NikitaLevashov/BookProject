@@ -1,31 +1,20 @@
 ﻿using BookProject.interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BookProject
 {
     public class BookListService
     {
+        private readonly IBookListStorage _storage;
+
         /// <summary>
         /// Initializes a new instance of the BookListService class.
         /// </summary>
         /// <param name="books">Books to be stored.</param>
-        public BookListService(params Book[] books)
+        public BookListService(IBookListStorage storage)
         {
-            Books = new List<Book>();
-
-            foreach (Book book in books)
-            {
-                if (book == null)
-                {
-                    continue;
-                }
-
-                Books.Add(book);
-            }
+            _storage = storage;
         }
 
         /// <summary>
@@ -38,9 +27,11 @@ namespace BookProject
         /// </summary>
         /// <param name="book">Book to be added.</param>
         /// <exception cref="ArgumentException">Thrown when the book has already been stored.</exception>
-        /// <exception cref="ArgumentException">Thrown when the argument is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the argument is null.</exception>
         public void Add(Book book)
         {
+            Books = _storage.Load();
+
             if (book == null)
             {
                 throw new ArgumentNullException(nameof(book));
@@ -48,10 +39,11 @@ namespace BookProject
 
             if (Books.IndexOf(book) >= 0)
             {
-                throw new ArgumentException("The  book has already been stored.", nameof(book));
+                throw new ArgumentException("The book has been added.", nameof(book));
             }
 
             Books.Add(book);
+            Save();
         }
 
         /// <summary>
@@ -59,20 +51,28 @@ namespace BookProject
         /// </summary>
         /// <param name="book">Book to be removed.</param>
         /// <exception cref="ArgumentException">Thrown when the book couldn't be found.</exception>
-        /// <exception cref="ArgumentException">Thrown when the argument is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the argument is null.</exception>
         public void Remove(Book book)
         {
+            Books = _storage.Load();
+
+            if (Books.Count == 0)
+            {
+                throw new ArgumentException("The storage empty, you can not remove book", nameof(book));
+            }
+
             if (book == null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(book));
             }
 
             if (Books.IndexOf(book) == -1)
             {
-                throw new ArgumentException("The BookListStorage doesn't contain the book.", nameof(book));
+                throw new ArgumentException("The storage doesn't contain the book.", nameof(book));
             }
 
             Books.Remove(book);
+            Save();
         }
 
         /// <summary>
@@ -80,7 +80,16 @@ namespace BookProject
         /// </summary>
         public void Sort()
         {
+            Books = _storage.Load();
             Books.Sort();
+            Save();           
+        }
+
+        public void Sort(IComparer<Book> comparator)
+        {
+            Books = _storage.Load();
+            Books.Sort(comparator);
+            Save();
         }
 
         /// <summary>
@@ -89,37 +98,35 @@ namespace BookProject
         /// <param name="searcher">searcher</param>
         /// <param name="tag">book field</param>
         /// <returns></returns>
-        public List<Book> FindByTag(IFindByTag finder)
+        public IEnumerable<Book> FindByTag(IFindByTag finder)
         {
-            List<Book> result = new List<Book>();
+            Books = _storage.Load();
 
             foreach (Book book in Books)
             {
                 if (finder.Contain(book))
                 {
-                    result.Add(book);
+                    yield return book;
                 }
             }
-
-            return result;
         }
 
         /// <summary>
         /// Save books to the specified storage.
         /// </summary>
         /// <param name="books">Books to be stored.</param>
-        public void Save(IBookListStorage storage)
+        public void Save()
         {
-            storage.Save(Books);
+            _storage.Save(Books);
         }
 
         /// <summary>
         /// Load books from the specified storage.
         /// </summary>
         /// <param name="storage">Storage to load books from.</param>
-        public void Load(IBookListStorage storage)
+        public void Load()
         {
-            Books = storage.Load();
+            Books = _storage.Load();
         }
     }
 }

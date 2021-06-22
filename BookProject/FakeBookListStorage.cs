@@ -11,10 +11,16 @@ namespace BookProject
     {
         public List<Book> BookList { get; set; }
 
-        public FakeBookListStorage(List<Book> book)
+        public FakeBookListStorage()
         {
-            BookList = book;
+            BookList = new List<Book>();
         }
+
+        public FakeBookListStorage(List<Book> list)
+        {
+            BookList = list;
+        }
+
         public List<Book> Load()
         {
             return BookList;
@@ -22,7 +28,7 @@ namespace BookProject
 
         public void Save(List<Book> books)
         {
-            BookList.AddRange(books);   
+            BookList = books;
         }
     }
 }

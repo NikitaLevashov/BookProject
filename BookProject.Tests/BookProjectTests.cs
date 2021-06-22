@@ -1,4 +1,6 @@
 using BookProject.interfaces;
+using BookProject.Tests.Comparators;
+using BookProject.Tests.Tags;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -279,17 +281,50 @@ namespace BookProject.Tests
         }
 
         [Test]
+        public void Tests_ToSave_SaveBookInStorage_()
+        {
+            List<Book> fakeList = new List<Book> { book1};
+            FakeBookListStorage fake = new FakeBookListStorage(fakeList);
+            BookListService service = new BookListService(fake);
+            service.Add(book);
+            service.Save();
+
+            var excpected = 2;
+
+            Assert.AreEqual(excpected, fake.BookList.Count);
+        }
+
+        [Test]
+        public void Tests_ToSave_LoadBookInStorage_()
+        {
+            List<Book> fakeList = new List<Book> { book1, book2, book };
+            FakeBookListStorage fake = new FakeBookListStorage(fakeList);
+            BookListService service = new BookListService(fake);
+            service.Load();
+
+            var actual = service.Books.Count;
+
+            var excpected = 3;
+
+            Assert.AreEqual(excpected, actual);
+        }
+
+        [Test]
         public void Add_WithRepetitiveBook_ThrowArgumentException()
         {
-            BookListService service = new BookListService(book1, book, book2);
-              Assert.Throws<ArgumentException>(() => service.Add(book));
+            List<Book> fakeList = new List<Book> { book1, book, book2 };
+            FakeBookListStorage fake = new FakeBookListStorage(fakeList);
+            BookListService service = new BookListService(fake);
+            Assert.Throws<ArgumentException>(() => service.Add(book));
         }
 
 
         [Test]
         public void Tests_AddNewBook()
         {
-            BookListService service = new BookListService(book1, book2);
+            List<Book> fakeList = new List<Book> { book1, book2 };
+            FakeBookListStorage fake = new FakeBookListStorage(fakeList);
+            BookListService service = new BookListService(fake);
             service.Add(book);
 
             var excpected = 3;
@@ -300,7 +335,9 @@ namespace BookProject.Tests
         [Test]
         public void Tests_RemoveBook()
         {
-            BookListService service = new BookListService(book1, book2, book);
+            List<Book> fakeList = new List<Book> { book1, book2, book };
+            FakeBookListStorage fake = new FakeBookListStorage(fakeList);
+            BookListService service = new BookListService(fake);
             service.Remove(book);
 
             var excpected = 2;
@@ -311,7 +348,9 @@ namespace BookProject.Tests
         [Test]
         public void Tests_SortBook()
         {
-            BookListService service = new BookListService(book1, book, book2);
+            List<Book> fakeList = new List<Book> { book1, book, book2 };
+            FakeBookListStorage fake = new FakeBookListStorage(fakeList);
+            BookListService service = new BookListService(fake);
             List<Book> list = new List<Book>() { book1, book2, book };
             service.Sort();
 
@@ -319,9 +358,23 @@ namespace BookProject.Tests
         }
 
         [Test]
+        public void Tests_SortWithComparers()
+        {
+            List<Book> fakeList = new List<Book> { book1, book, book2 };
+            FakeBookListStorage fake = new FakeBookListStorage(fakeList);
+            BookListService service = new BookListService(fake);
+            List<Book> list = new List<Book>() { book2, book1, book };
+            service.Sort(new AuthorCompare());
+
+            CollectionAssert.AreEqual(list, service.Books);
+        }
+
+        [Test]
         public void Tests_FindByTag_ByTitle()
         {
-            BookListService service = new BookListService(book1, book, book2);
+            List<Book> fakeList = new List<Book> { book1, book, book2 };
+            FakeBookListStorage fake = new FakeBookListStorage(fakeList);
+            BookListService service = new BookListService(fake);
             var resultBool = new TitleTags("C# forever book").Contain(book);
             var excpected = true;
 
@@ -331,7 +384,9 @@ namespace BookProject.Tests
         [Test]
         public void Tests_FindByTag_ByAuthor()
         {
-            BookListService service = new BookListService(book1, book, book2);
+            List<Book> fakeList = new List<Book> { book1, book, book2 };
+            FakeBookListStorage fake = new FakeBookListStorage(fakeList);
+            BookListService service = new BookListService(fake);
             var resultBool = new AuthorTags("Alex").Contain(book2);
             var excpected = true;
 
@@ -341,7 +396,9 @@ namespace BookProject.Tests
         [Test]
         public void Tests_FindByTag_ByIsbn()
         {
-            BookListService service = new BookListService(book1, book, book2);
+            List<Book> fakeList = new List<Book> { book1, book, book2 };
+            FakeBookListStorage fake = new FakeBookListStorage(fakeList);
+            BookListService service = new BookListService(fake);
             var resultBool = new IsbnTags("0-306-40615-2").Contain(book2);
             var excpected = true;
 
@@ -350,10 +407,12 @@ namespace BookProject.Tests
 
 
         private Mock<IBookListStorage> mock;
+        private Mock<IFindByTag> mockTag;
 
         [OneTimeSetUp]
         public void SetUp()
         {
+            mockTag = new Mock<IFindByTag>();
             mock = new Mock<IBookListStorage>();
         }
 
@@ -364,9 +423,7 @@ namespace BookProject.Tests
 
             IBookListStorage provider = mock.Object;
 
-            var transformer = new BookListService(book1, book2);
-
-            transformer.Load(provider);
+            var transformer = new BookListService(provider);
 
             mock.Verify(transformer => transformer.Load(), Times.Once());
         }
@@ -378,12 +435,30 @@ namespace BookProject.Tests
 
             IBookListStorage provider = mock.Object;
 
-            var transformer = new BookListService(book1, book2);
+            var transformer = new BookListService(provider);
 
-            transformer.Save(provider);
+            transformer.Save();
 
             mock.Verify(transformer => transformer.Save(It.IsAny<List<Book>>()), Times.Once());
         }
+
+        [Test]
+        public void TagsOnceTime()
+        {
+            IBookListStorage provider = mock.Object;
+
+            mockTag.Setup(providerTag => providerTag.Contain(It.IsAny<Book>()));
+
+            IFindByTag providerTag = mockTag.Object;
+
+            var transformer = new BookListService(provider);
+
+            transformer.FindByTag(providerTag);
+
+            mockTag.Verify();
+        }
+
+
 
 
     }

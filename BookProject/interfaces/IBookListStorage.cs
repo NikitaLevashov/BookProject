@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace BookProject.interfaces
 {
+    /// <summary>
+    /// interface IBookListStrorage
+    /// </summary>
     public interface IBookListStorage
     {
         /// <summary>

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BookProject
+namespace BookProject.Tests.Tags
 {
     /// <summary>
     /// Determines if the book contains the specified ISBN
@@ -56,7 +56,7 @@ namespace BookProject
     }
 
     /// <summary>
-    /// Determines if the book contains the specified Publishing house
+    /// Determines if the book contains the specified Publisher
     /// </summary>
     public class PublichingHouseTags : IFindByTag
     {
