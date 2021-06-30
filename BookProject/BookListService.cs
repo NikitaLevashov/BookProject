@@ -9,22 +9,29 @@ namespace BookProject
 {
     public class BookListService
     {
-        private readonly IBookListStorage _storage;
-
         /// <summary>
         ///BookListService.
         /// </summary>
         /// <param name="books">Books to be stored.</param>
-        public BookListService(IBookListStorage storage)
+        public BookListService(params Book[] books)
         {
-            _storage = storage;
-            Books = _storage.Load();
+            Books = new List<Book>();
+
+            foreach (Book book in books)
+            {
+                if (book == null)
+                {
+                    continue;
+                }
+
+                Books.Add(book);
+            }
         }
 
         /// <summary>
         /// List of books to operate with.
         /// </summary>
-        public List<Book> Books { get; private set; }
+        public List<Book> Books {private get; set; }
 
         /// <summary>
         /// Add the book.
@@ -74,13 +81,16 @@ namespace BookProject
         }
 
         /// <summary>
-        /// Sort books using the given comparator.
+        /// Sort books.
         /// </summary>
         public void Sort()
         {
             Books.Sort();
         }
 
+        /// <summary>
+        /// Sort books using the given comparator.
+        /// </summary>
         public void Sort(IComparer<Book> comparator)
         {
             Books.Sort(comparator);
@@ -89,14 +99,13 @@ namespace BookProject
         /// <summary>
         /// Find books by some field
         /// </summary>
-        /// <param name="searcher">searcher</param>
-        /// <param name="tag">book field</param>
+        /// <param name="finder">finder</param>
         /// <returns></returns>
         public IEnumerable<Book> FindByTag(IFindByTag finder)
         {
             foreach (Book book in Books)
             {
-                if (finder.Contain(book))
+                if (finder.IsMatch(book))
                 {
                     yield return book;
                 }
@@ -107,18 +116,33 @@ namespace BookProject
         /// Save books to the specified storage.
         /// </summary>
         /// <param name="books">Books to be stored.</param>
-        public void Save()
+        public void Save(IBookListStorage storage)
         {
-            _storage.Save(Books);
+            if(storage == null)
+            {
+                throw new ArgumentNullException(nameof(storage));
+            }
+
+            storage.Save(Books);
         }
 
         /// <summary>
         /// Load books from the specified storage.
         /// </summary>
         /// <param name="storage">Storage to load books from.</param>
-        public void Load()
+        public void Load(IBookListStorage storage)
         {
-            Books = _storage.Load();
+            if (storage == null)
+            {
+                throw new ArgumentNullException(nameof(storage));
+            }
+
+            Books = storage.Load().ToList();
+        }
+
+        public int ReturnCountBookInService()
+        {
+            return Books.Count();
         }
     }
 }

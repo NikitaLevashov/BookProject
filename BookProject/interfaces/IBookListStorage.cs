@@ -15,12 +15,12 @@ namespace BookProject.interfaces
         /// Save books to the container.
         /// </summary>
         /// <param name="books">book.</param>
-        void Save(List<Book> books);
+        void Save(IEnumerable<Book> books);
 
         /// <summary>
         /// Load books to the container.
         /// </summary>
-        /// <returns>List of loaded books.</returns>
-        List<Book> Load();
+        /// <returns>Enumerable source of loaded books.</returns>
+        IEnumerable<Book> Load();
     }
 }

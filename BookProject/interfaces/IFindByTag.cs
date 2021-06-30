@@ -13,6 +13,6 @@ namespace BookProject.interfaces
         /// </summary>
         /// <param name="book">The book to be checked.</param>
         /// <returns>True, if the book match; otherwise, false.</returns>
-        bool Contain(Book book);
+        bool IsMatch(Book book);
     }
 }

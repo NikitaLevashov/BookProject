@@ -17,7 +17,7 @@ namespace BookProject.Tests.Tags
         {
             ISBN = isbn;
         }
-        public bool Contain(Book book)
+        public bool IsMatch(Book book)
         {
             return (book.ISBN == this.ISBN) ? true : false;
         }
@@ -33,7 +33,7 @@ namespace BookProject.Tests.Tags
         {
             Author = autor;
         }
-        public bool Contain(Book book)
+        public bool IsMatch(Book book)
         {
             return (book.Author == this.Author) ? true : false;
         }
@@ -49,7 +49,7 @@ namespace BookProject.Tests.Tags
         {
             Title = title;
         }
-        public bool Contain(Book book)
+        public bool IsMatch(Book book)
         {
             return (book.Title == this.Title) ? true : false;
         }
@@ -65,7 +65,7 @@ namespace BookProject.Tests.Tags
         {
             Publisher = publishingHouse;
         }
-        public bool Contain(Book book)
+        public bool IsMatch(Book book)
         {
             return (book.Publisher == this.Publisher) ? true : false;
         }

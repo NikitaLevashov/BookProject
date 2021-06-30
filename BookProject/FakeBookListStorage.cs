@@ -21,14 +21,14 @@ namespace BookProject
             BookList = list;
         }
 
-        public List<Book> Load()
+        public void Save(IEnumerable<Book> books)
         {
-            return BookList;
+            BookList = books.ToList();
         }
 
-        public void Save(List<Book> books)
+        public IEnumerable<Book> Load()
         {
-            BookList = books;
+            return BookList;
         }
     }
 }
