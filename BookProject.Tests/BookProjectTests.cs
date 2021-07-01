@@ -355,7 +355,7 @@ namespace BookProject.Tests
             BookListService service = new BookListService(book1, book, book2);
             FakeBookListStorage fake = new FakeBookListStorage();
             List<Book> list = new List<Book>() { book1, book2, book };
-            service.Sort();
+            service.SortDefault();
             service.Save(fake);
 
             CollectionAssert.AreEqual(list, fake.BookList);

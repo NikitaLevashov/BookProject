@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BookProject
 {
@@ -31,7 +29,7 @@ namespace BookProject
         /// <summary>
         /// List of books to operate with.
         /// </summary>
-        public List<Book> Books {private get; set; }
+        private List<Book> Books {get; set; }
 
         /// <summary>
         /// Add the book.
@@ -83,7 +81,7 @@ namespace BookProject
         /// <summary>
         /// Sort books.
         /// </summary>
-        public void Sort()
+        public void SortDefault()
         {
             Books.Sort();
         }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BookProject
+namespace BookProject.Tests
 {
     public class FakeBookListStorage : IBookListStorage
     {
